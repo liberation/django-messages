@@ -1,45 +1,82 @@
 import datetime
 from django.db import models
 from django.conf import settings
-from django.db.models import signals
+from django.db.models import signals, Max
 from django.db.models.query import QuerySet
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 
 class MessageManager(models.Manager):
 
+    @property
+    def related(self):
+        return self.select_related('recipient', 'sender', 'sender__libeuser')
+
+    @property
+    def _conversations(self):
+        """
+        Returns latest message id for each conversations
+        """
+        return self.values(
+            'conversation'
+        ).annotate(
+            Max('id')
+        ).values_list(
+            'id__max', 
+            flat=True
+        ).order_by(
+            'conversation'
+        )
+
     def inbox_for(self, user):
         """
-        Returns all messages that were received by the given user and are not
-        marked as deleted.
+        Return Inbox by filtering conversations containing messages
+        received by given user that were not deleted
         """
-        return self.filter(
-            recipient=user,
-            recipient_deleted_at__isnull=True,
+        return self.related.filter(
+            id__in=self._conversations.filter(
+                recipient=user, 
+                recipient_deleted_at__isnull=True
+            )
         )
 
     def outbox_for(self, user):
         """
-        Returns all messages that were sent by the given user and are not
-        marked as deleted.
+        Return Outbox by filtering conversations containing messages 
+        sent by given user that were not deleted
         """
-        return self.filter(
-            sender=user,
-            sender_deleted_at__isnull=True,
+        return self.related.filter(
+            id__in=self._conversations.filter(
+                sender=user,
+                sender_deleted_at__isnull=True,
+            )
         )
 
     def trash_for(self, user):
         """
-        Returns all messages that were either received or sent by the given
-        user and are marked as deleted.
+        Return Trash by filtering conversations containing messages 
+        sent by given user that were deleted
         """
-        return self.filter(
-            recipient=user,
-            recipient_deleted_at__isnull=False,
-        ) | self.filter(
-            sender=user,
-            sender_deleted_at__isnull=False,
+        tmp = self._conversations.filter(
+                sender=user,
+                sender_deleted_at__isnull=False,
+        ) | self._conversations.filter(
+                recipient=user,
+                recipient_deleted_at__isnull=False,
         )
+        return self.related.filter(
+            id__in=tmp
+        )
+        
+    def get_conversation(self, conversation):
+        """
+        Returns a specific conversation. We don't filter by user here,
+        since we have the conversation id. The view should check the 
+        recipient/sender fields if necessary.        
+        """
+        return self.related.filter(
+            conversation=conversation
+        ).order_by('sent_at')
 
 
 class Message(models.Model):
@@ -48,9 +85,10 @@ class Message(models.Model):
     """
     subject = models.CharField(_("Subject"), max_length=120)
     body = models.TextField(_("Body"))
-    sender = models.ForeignKey(User, related_name='sent_messages', verbose_name=_("Sender"), blank=True, null=True)
-    recipient = models.ForeignKey(User, related_name='received_messages', null=True, blank=True, verbose_name=_("Recipient"))
+    sender = models.ForeignKey(User, related_name='sent_messages', null=True, verbose_name=_("Sender"))
+    recipient = models.ForeignKey(User, related_name='received_messages', null=True, verbose_name=_("Recipient"))
     parent_msg = models.ForeignKey('self', related_name='next_messages', null=True, blank=True, verbose_name=_("Parent message"))
+    conversation = models.ForeignKey('self', null=True, blank=True, verbose_name=_("Conversation"))
     sent_at = models.DateTimeField(_("sent at"), null=True, blank=True)
     read_at = models.DateTimeField(_("read at"), null=True, blank=True)
     replied_at = models.DateTimeField(_("replied at"), null=True, blank=True)
@@ -75,7 +113,7 @@ class Message(models.Model):
         return self.subject
     
     def get_absolute_url(self):
-        return ('messages_detail', [self.id])
+        return ('messages_detail', [self.conversation_id])
     get_absolute_url = models.permalink(get_absolute_url)
     
     def save(self, **kwargs):

@@ -2,7 +2,7 @@
 import datetime
 
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -26,9 +26,9 @@ def inbox(request, template_name='django_messages/inbox.html'):
     Optional Arguments:
         ``template_name``: name of the template to use.
     """
-    message_list = Message.objects.inbox_for(request.user)
+    conversations = Message.objects.inbox_for(request.user)
     return render_to_response(template_name, {
-        'message_list': message_list,
+        'conversations': conversations,
     }, context_instance=RequestContext(request))
 inbox = login_required(inbox)
 
@@ -38,9 +38,9 @@ def outbox(request, template_name='django_messages/outbox.html'):
     Optional arguments:
         ``template_name``: name of the template to use.
     """
-    message_list = Message.objects.outbox_for(request.user)
+    conversations = Message.objects.outbox_for(request.user)
     return render_to_response(template_name, {
-        'message_list': message_list,
+        'conversations': conversations,
     }, context_instance=RequestContext(request))
 outbox = login_required(outbox)
 
@@ -52,9 +52,9 @@ def trash(request, template_name='django_messages/trash.html'):
     Hint: A Cron-Job could periodicly clean up old messages, which are deleted
     by sender and recipient.
     """
-    message_list = Message.objects.trash_for(request.user)
+    conversations = Message.objects.trash_for(request.user)
     return render_to_response(template_name, {
-        'message_list': message_list,
+        'conversations': conversations,
     }, context_instance=RequestContext(request))
 trash = login_required(trash)
 
@@ -65,17 +65,15 @@ def compose(request, recipient=None, form_class=ComposeForm,
     Required Arguments: None
     Optional Arguments:
         ``recipient``: username of a `django.contrib.auth` User, who should
-                       receive the message, optionally multiple usernames
-                       could be separated by a '+'
+                       receive the message
         ``form_class``: the form-class to use
         ``template_name``: the template to use
         ``success_url``: where to redirect after successfull submission
     """
     if request.method == "POST":
-        sender = request.user
-        form = form_class(request.POST, recipient_filter=recipient_filter)
+        form = form_class(request.POST, recipient_filter=recipient_filter, sender=request.user)
         if form.is_valid():
-            form.save(sender=request.user)
+            form.save()
             request.user.message_set.create(
                 message=_(u"Message successfully sent."))
             if success_url is None:
@@ -86,8 +84,9 @@ def compose(request, recipient=None, form_class=ComposeForm,
     else:
         form = form_class()
         if recipient is not None:
-            recipients = [u for u in User.objects.filter(username__in=[r.strip() for r in recipient.split('+')])]
-            form.fields['recipient'].initial = recipients
+            recipients = User.objects.filter(username=recipient)
+            if recipients:
+                form.fields['recipient'].initial = recipients[0]
     return render_to_response(template_name, {
         'form': form,
     }, context_instance=RequestContext(request))
@@ -103,59 +102,56 @@ def reply(request, message_id, form_class=ComposeForm,
     the quote by default but you can use different formater.
     """
     parent = get_object_or_404(Message, id=message_id)
-    
-    if parent.sender != request.user and parent.recipient != request.user:
-        raise Http404
+    data = _get_form_data_and_check_parent(request, parent, quote)
     
     if request.method == "POST":
-        sender = request.user
-        form = form_class(request.POST, recipient_filter=recipient_filter)
+        postdata = request.POST.copy()
+        postdata["recipient"] = data["recipient"]
+        postdata["subject"] = data["subject"]
+        form = form_class(postdata, recipient_filter=recipient_filter, sender=request.user)
         if form.is_valid():
-            form.save(sender=request.user, parent_msg=parent)
+            form.save(parent_msg=parent)
             request.user.message_set.create(
                 message=_(u"Message successfully sent."))
             if success_url is None:
                 success_url = reverse('messages_inbox')
             return HttpResponseRedirect(success_url)
     else:
-        form = form_class({
-            'body': quote(parent.sender, parent.body),
-            'subject': _(u"Re: %(subject)s") % {'subject': parent.subject},
-            'recipient': [parent.sender,]
-            })
+        form = form_class(data)
     return render_to_response(template_name, {
         'form': form,
     }, context_instance=RequestContext(request))
 reply = login_required(reply)
 
-def delete(request, message_id, success_url=None):
+def delete(request, conversation_id, 
+    success_url=None):
     """
-    Marks a message as deleted by sender or recipient. The message is not
+    Marks a conversation as deleted. The messages are not
     really removed from the database, because two users must delete a message
-    before it's save to remove it completely. 
+    before it's safe to remove it completely. 
     A cron-job should prune the database and remove old messages which are 
     deleted by both users.
     As a side effect, this makes it easy to implement a trash with undelete.
     
     You can pass ?next=/foo/bar/ via the url to redirect the user to a different
-    page (e.g. `/foo/bar/`) than ``success_url`` after deletion of the message.
+    page (e.g. `/foo/bar/`) than ``success_url`` after deletion of the 
+    conversation.
     """
     user = request.user
     now = datetime.datetime.now()
-    message = get_object_or_404(Message, id=message_id)
+    queryset = Message.objects.get_conversation(conversation=conversation_id)
+    conversation = get_list_or_404(queryset)
     deleted = False
     if success_url is None:
         success_url = reverse('messages_inbox')
     if request.GET.has_key('next'):
         success_url = request.GET['next']
-    if message.sender == user:
-        message.sender_deleted_at = now
-        deleted = True
-    if message.recipient == user:
-        message.recipient_deleted_at = now
-        deleted = True
+    # FIXME: is there a clean way to combine those 2 requests in one ?
+    result1 = queryset.filter(recipient=user).update(recipient_deleted_at=now)
+    result2 = queryset.filter(sender=user).update(sender_deleted_at=now)
+    if result1 or result2:
+        deleted = True    
     if deleted:
-        message.save()
         user.message_set.create(message=_(u"Message successfully deleted."))
         if notification:
             notification.send([user], "messages_deleted", {'message': message,})
@@ -163,51 +159,79 @@ def delete(request, message_id, success_url=None):
     raise Http404
 delete = login_required(delete)
 
-def undelete(request, message_id, success_url=None):
+def undelete(request, conversation_id,
+    success_url=None):
     """
-    Recovers a message from trash. This is achieved by removing the
+    Recovers a conversation from trash. This is achieved by removing the
     ``(sender|recipient)_deleted_at`` from the model.
     """
     user = request.user
-    message = get_object_or_404(Message, id=message_id)
+    queryset = Message.objects.get_conversation(conversation=conversation_id)
     undeleted = False
     if success_url is None:
         success_url = reverse('messages_inbox')
     if request.GET.has_key('next'):
         success_url = request.GET['next']
-    if message.sender == user:
-        message.sender_deleted_at = None
-        undeleted = True
-    if message.recipient == user:
-        message.recipient_deleted_at = None
-        undeleted = True
+    
+    # FIXME: is there a clean way to combine those 2 requests in one ?
+    # FIXME: refactor, it's very similar to delete()
+    result1 = queryset.filter(recipient=user).update(recipient_deleted_at=None)
+    result2 = queryset.filter(sender=user).update(sender_deleted_at=None)
+    if result1 or result2:
+       undeleted = True    
+        
     if undeleted:
-        message.save()
         user.message_set.create(message=_(u"Message successfully recovered."))
         if notification:
             notification.send([user], "messages_recovered", {'message': message,})
         return HttpResponseRedirect(success_url)
     raise Http404
 undelete = login_required(undelete)
+    
+def _get_form_data_and_check_parent(request, parent, quote=format_quote):
+    if parent.sender != request.user and parent.recipient != request.user:
+        raise Http404
+    
+    if parent.sender == request.user:
+        recipient = parent.recipient
+    else:
+        recipient = parent.sender
+        
+    data = {
+        'body': _(u"%(sender)s wrote:\n%(body)s") % {
+            'sender': parent.sender, 
+            'body': quote(parent.body)
+            }, 
+        'subject': _(u"Re: %(subject)s") % {'subject': parent.subject},
+        'recipient': recipient,
+    }
+    
+    return data
 
-def view(request, message_id, template_name='django_messages/view.html'):
+def view(request, conversation_id, 
+    form_class=ComposeForm,
+    template_name='django_messages/view.html'):
     """
-    Shows a single message.``message_id`` argument is required.
-    The user is only allowed to see the message, if he is either 
+    Shows a single conversation.``conversation_id`` argument is required.
+    The user is only allowed to see the conversation, if he is either 
     the sender or the recipient. If the user is not allowed a 404
     is raised. 
     If the user is the recipient and the message is unread 
     ``read_at`` is set to the current datetime.
     """
-    user = request.user
-    now = datetime.datetime.now()
-    message = get_object_or_404(Message, id=message_id)
-    if (message.sender != user) and (message.recipient != user):
+    conversation = Message.objects.get_conversation(conversation=conversation_id)
+    if not conversation:
         raise Http404
-    if message.read_at is None and message.recipient == user:
-        message.read_at = now
-        message.save()
+    
+    # FIXME: will force query evaluation. Is that a problem ?
+    data = _get_form_data_and_check_parent(request, conversation[len(conversation) - 1])
+    
+    # FIXME This might be costly, since read_at is not indexed
+    now = datetime.datetime.now()
+    conversation.filter(recipient=request.user, read_at__isnull=True).update(read_at=now)
+
     return render_to_response(template_name, {
-        'message': message,
+        'conversation': conversation,
+        'form' : form_class(data),
     }, context_instance=RequestContext(request))
 view = login_required(view)
