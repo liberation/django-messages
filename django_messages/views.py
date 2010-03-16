@@ -20,7 +20,8 @@ from django_messages.utils import format_quote
 #else:
 notification = None
 
-def inbox(request, template_name='django_messages/inbox.html'):
+def inbox(request, template_name='django_messages/inbox.html', 
+    *args, **kwargs):
     """
     Displays a list of received messages for the current user.
     Optional Arguments:
@@ -32,7 +33,8 @@ def inbox(request, template_name='django_messages/inbox.html'):
     }, context_instance=RequestContext(request))
 inbox = login_required(inbox)
 
-def outbox(request, template_name='django_messages/outbox.html'):
+def outbox(request, template_name='django_messages/outbox.html', 
+    *args, **kwargs):
     """
     Displays a list of sent messages by the current user.
     Optional arguments:
@@ -44,7 +46,8 @@ def outbox(request, template_name='django_messages/outbox.html'):
     }, context_instance=RequestContext(request))
 outbox = login_required(outbox)
 
-def trash(request, template_name='django_messages/trash.html'):
+def trash(request, template_name='django_messages/trash.html', 
+    *args, **kwargs):
     """
     Displays a list of deleted messages. 
     Optional arguments:
@@ -59,7 +62,8 @@ def trash(request, template_name='django_messages/trash.html'):
 trash = login_required(trash)
 
 def compose(request, recipient=None, form_class=ComposeForm,
-        template_name='django_messages/compose.html', success_url=None, recipient_filter=None):
+        template_name='django_messages/compose.html', success_url=None, recipient_filter=None,
+        *args, **kwargs):
     """
     Displays and handles the ``form_class`` form to compose new messages.
     Required Arguments: None
@@ -94,7 +98,8 @@ compose = login_required(compose)
 
 def reply(request, message_id, form_class=ComposeForm,
         template_name='django_messages/compose.html', success_url=None, recipient_filter=None,
-        quote=format_quote):
+        quote=format_quote, 
+        *args, **kwargs):
     """
     Prepares the ``form_class`` form for writing a reply to a given message
     (specified via ``message_id``). It uses the ``format_quote`` helper from
@@ -124,7 +129,8 @@ def reply(request, message_id, form_class=ComposeForm,
 reply = login_required(reply)
 
 def delete(request, conversation_id, 
-    success_url=None):
+    success_url=None, 
+    *args, **kwargs):
     """
     Marks a conversation as deleted. The messages are not
     really removed from the database, because two users must delete a message
@@ -160,7 +166,8 @@ def delete(request, conversation_id,
 delete = login_required(delete)
 
 def undelete(request, conversation_id,
-    success_url=None):
+    success_url=None, 
+    *args, **kwargs):
     """
     Recovers a conversation from trash. This is achieved by removing the
     ``(sender|recipient)_deleted_at`` from the model.
@@ -210,7 +217,8 @@ def _get_form_data_and_check_parent(request, parent, quote=format_quote):
 
 def view(request, conversation_id, 
     form_class=ComposeForm,
-    template_name='django_messages/view.html'):
+    template_name='django_messages/view.html',
+    *args, **kwargs):
     """
     Shows a single conversation.``conversation_id`` argument is required.
     The user is only allowed to see the conversation, if he is either 
