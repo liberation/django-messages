@@ -10,6 +10,11 @@ from django.contrib.auth.models import User
 #else:
 notification = None
 
+if "blacklist" in settings.INSTALLED_APPS:
+    from blacklist import models as blacklist
+else:
+    blacklist = None
+
 from django_messages.models import Message
 from django_messages.fields import CommaSeparatedUserField
 
@@ -35,6 +40,15 @@ class ComposeForm(forms.Form):
         if not self.sender:
             raise forms.ValidationError(_(u"Unknown user")) 
         return self.cleaned_data
+
+    def clean_recipient(self):
+        # Note: We can't do this in fields.py because we need the sender
+        recipient = self.cleaned_data['recipient']
+        if blacklist and blacklist.is_blacklisting(recipient, self.sender):
+            raise forms.ValidationError(
+                _(u"%(recipient)s has blacklisted you, you can't message him any more.") % 
+                { 'recipient' : recipient }) 
+        return recipient
                 
     def save(self, parent_msg=None):
         # recipients = self.cleaned_data['recipient']
