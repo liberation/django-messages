@@ -1,13 +1,21 @@
 """
 Based on http://www.djangosnippets.org/snippets/595/
 by sopelkin
+and http://www.djangosnippets.org/snippets/1196/
+by sma
 """
 
 from django import forms
+from django.conf import settings
 from django.forms import widgets
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 
+try:
+    from ajax_select.fields import AutoCompleteField
+    f = settings.AJAX_LOOKUP_CHANNELS['following']
+except:
+    AutoCompleteField = None
 
 class CommaSeparatedUserInput(widgets.Input):
     input_type = 'text'
@@ -54,4 +62,24 @@ class CommaSeparatedUserField(forms.Field):
         
         return users
 
+class BaseUserField(forms.CharField): 
+    widget = widgets.TextInput
+        
+    def clean(self, value): 
+        value = super(BaseUserField, self).clean(value) 
+        if not value: 
+            return None 
+        try: 
+            return User.objects.get(username=value) 
+        except User.DoesNotExist: 
+            raise forms.ValidationError(_(u"There is no user with this username.")) 
 
+if AutoCompleteField:
+    class UserField(BaseUserField, AutoCompleteField):
+        def __init__(self, *args, **kwargs):
+            args = ('following',)
+            super(UserField, self).__init__(*args, **kwargs)
+else:
+    UserField = BaseUserField
+
+    
