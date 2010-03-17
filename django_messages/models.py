@@ -10,7 +10,7 @@ class MessageManager(models.Manager):
 
     @property
     def related(self):
-        return self.select_related('recipient', 'sender', 'sender__libeuser')
+        return self.select_related('recipient', 'sender')
 
     @property
     def _conversations(self):
