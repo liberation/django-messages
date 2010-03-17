@@ -16,7 +16,7 @@ else:
     blacklist = None
 
 from django_messages.models import Message
-from django_messages.fields import CommaSeparatedUserField
+from django_messages.fields import UserField
 
 class ComposeForm(forms.Form):
     """
