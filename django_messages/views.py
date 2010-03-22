@@ -205,10 +205,7 @@ def _get_form_data_and_check_parent(request, parent, quote=format_quote):
         recipient = parent.sender
         
     data = {
-        'body': _(u"%(sender)s wrote:\n%(body)s") % {
-            'sender': parent.sender, 
-            'body': quote(parent.body)
-            }, 
+        'body': quote(parent.sender, parent.body),
         'subject': _(u"Re: %(subject)s") % {'subject': parent.subject},
         'recipient': recipient,
     }
