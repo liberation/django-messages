@@ -10,10 +10,12 @@ from django.contrib.auth.models import User
 #else:
 notification = None
 
-if "blacklist" in settings.INSTALLED_APPS:
-    from blacklist import models as blacklist
+if "relationships" in settings.INSTALLED_APPS:
+    from relationships.models import Relationship
+    from relationships.constants import *
+    relationships = True
 else:
-    blacklist = None
+    relationships = False
 
 from django_messages.models import Message
 from django_messages.fields import UserField
@@ -44,7 +46,9 @@ class ComposeForm(forms.Form):
     def clean_recipient(self):
         # Note: We can't do this in fields.py because we need the sender
         recipient = self.cleaned_data['recipient']
-        if blacklist and blacklist.is_blacklisting(recipient, self.sender):
+        if relationships and Relationships.objects.filter(from_user=recipient,
+                                                          to_user=self.sender,
+                                                          status=RELATIONSHIP_BLOCKED).count()
             raise forms.ValidationError(
                 _(u"%(recipient)s has blacklisted you, you can't message him any more.") % 
                 { 'recipient' : recipient }) 
