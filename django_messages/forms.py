@@ -48,7 +48,7 @@ class ComposeForm(forms.Form):
         recipient = self.cleaned_data['recipient']
         if relationships and Relationships.objects.filter(from_user=recipient,
                                                           to_user=self.sender,
-                                                          status=RELATIONSHIP_BLOCKED).count()
+                                                          status=RELATIONSHIP_BLOCKED).count():
             raise forms.ValidationError(
                 _(u"%(recipient)s has blacklisted you, you can't message him any more.") % 
                 { 'recipient' : recipient }) 
