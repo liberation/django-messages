@@ -11,10 +11,14 @@ from django.forms import widgets
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 
-try:
+if "relationships" in settings.INSTALLED_APPS and 
+   "ajax_select" in settings.INSTALLED_APPS:
+    from relationships.models import Relationship
+    from relationships.constants import *
     from ajax_select.fields import AutoCompleteField
     f = settings.AJAX_LOOKUP_CHANNELS['following']
-except:
+    relationships = True
+else:
     AutoCompleteField = None
 
 class CommaSeparatedUserInput(widgets.Input):
