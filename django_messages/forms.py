@@ -46,7 +46,7 @@ class ComposeForm(forms.Form):
     def clean_recipient(self):
         # Note: We can't do this in fields.py because we need the sender
         recipient = self.cleaned_data['recipient']
-        if relationships and Relationships.objects.filter(from_user=recipient,
+        if relationships and Relationship.objects.filter(from_user=recipient,
                                                           to_user=self.sender,
                                                           status=RELATIONSHIP_BLOCKED).count():
             raise forms.ValidationError(
