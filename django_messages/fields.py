@@ -63,15 +63,26 @@ class CommaSeparatedUserField(forms.Field):
 
 class BaseUserField(forms.CharField): 
     widget = widgets.TextInput
+    
+    def __init__(self, *args, **kwargs):
+        recipient_filter = kwargs.pop('recipient_filter', None)
+        self._recipient_filter = recipient_filter
+        super(BaseUserField, self).__init__(*args, **kwargs)
         
     def clean(self, value): 
         value = super(BaseUserField, self).clean(value) 
         if not value: 
             return None 
-        try: 
-            return User.objects.get(username=value) 
+        try:
+            user = User.objects.get(username=value) 
+            recipient_filter = self._recipient_filter
+            print recipient_filter
+            if recipient_filter is not None:
+                if not recipient_filter(user):
+                    raise forms.ValidationError(_(u"There is no user with this username."))
+            return user
         except User.DoesNotExist: 
-            raise forms.ValidationError(_(u"There is no user with this username.")) 
+            raise forms.ValidationError(_(u"There is no user with this username."))
 
 if AutoCompleteField:
     class UserField(BaseUserField, AutoCompleteField):
