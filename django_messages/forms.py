@@ -11,7 +11,6 @@ from django.contrib.auth.models import User
 notification = None
 
 if "relationships" in settings.INSTALLED_APPS:
-    from relationships.models import Relationship
     from relationships.constants import *
     relationships = True
 else:
@@ -46,9 +45,7 @@ class ComposeForm(forms.Form):
     def clean_recipient(self):
         # Note: We can't do this in fields.py because we need the sender
         recipient = self.cleaned_data['recipient']
-        if relationships and Relationship.objects.filter(from_user=recipient,
-                                                         to_user=self.sender,
-                                                         status=RELATIONSHIP_BLOCKING).count():
+        if relationships and recipient.relationships.exists(self.sender, RELATIONSHIP_BLOCKING):
             raise forms.ValidationError(
                 _(u"%(recipient)s has blacklisted you, you can't message him any more.") % 
                 { 'recipient' : recipient }) 
