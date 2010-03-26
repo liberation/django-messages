@@ -76,7 +76,6 @@ class BaseUserField(forms.CharField):
         try:
             user = User.objects.get(username=value) 
             recipient_filter = self._recipient_filter
-            print recipient_filter
             if recipient_filter is not None:
                 if not recipient_filter(user):
                     raise forms.ValidationError(_(u"There is no user with this username."))
