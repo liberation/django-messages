@@ -4,10 +4,10 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib import admin
 from django.contrib.auth.models import User, Group
 
-#if "notification" in settings.INSTALLED_APPS:
-#   from notification import models as notification
-#else:
-notification = None
+if "notification" in settings.INSTALLED_APPS:
+    from notification import models as notification
+else:
+    notification = None
 
 from django_messages.models import Message
 
