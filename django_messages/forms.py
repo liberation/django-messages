@@ -11,7 +11,7 @@ else:
     notification = None
 
 if "relationships" in settings.INSTALLED_APPS:
-    from relationships.constants import *
+    from relationships.models import RelationshipStatus
     relationships = True
 else:
     relationships = False
@@ -45,7 +45,7 @@ class ComposeForm(forms.Form):
     def clean_recipient(self):
         # Note: We can't do this in fields.py because we need the sender
         recipient = self.cleaned_data['recipient']
-        if relationships and recipient.relationships.exists(self.sender, RELATIONSHIP_BLOCKING):
+        if relationships and recipient.relationships.exists(self.sender, RelationshipStatus.objects.get(from_slug="blocking")):
             raise forms.ValidationError(
                 _(u"%(recipient)s has blacklisted you, you can't message him any more.") % 
                 { 'recipient' : recipient }) 
