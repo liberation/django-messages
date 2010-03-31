@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: messages\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-26 18:36+0100\n"
+"POT-Creation-Date: 2010-03-29 18:27+0200\n"
 "PO-Revision-Date: 2010-03-26 18:38+0100\n"
 "Last-Translator: Mathieu Pillard <m.pillard@liberation.fr>\n"
 "Language-Team: Frédéric Roland <frederic.roland@creativeconvergence.be>\n"
@@ -16,9 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: French\n"
 
-#: admin.py:19
-#: forms.py:26
-#: models.py:89
+#: admin.py:19 forms.py:26 models.py:89
 #: templates/django_messages/outbox.html:8
 #: templates/django_messages/view.html:12
 msgid "Recipient"
@@ -30,14 +28,15 @@ msgstr "groupe"
 
 #: admin.py:22
 msgid "Creates the message optionally for all users or a group of users."
-msgstr "Créé le message en option pour tous les utilisateurs ou un groupe d'utilisateurs."
+msgstr ""
+"Créé le message en option pour tous les utilisateurs ou un groupe "
+"d'utilisateurs."
 
 #: admin.py:29
 msgid "All users"
 msgstr "Tous les utilisateurs"
 
-#: admin.py:44
-#: models.py:126
+#: admin.py:44 models.py:126
 msgid "Message"
 msgstr "Message"
 
@@ -50,22 +49,18 @@ msgstr "Date/heure"
 msgid "The following usernames are incorrect: %(users)s"
 msgstr "Les noms d'utilisateurs suivants sont incorrects : %(users)s"
 
-#: fields.py:81
-#: fields.py:84
+#: fields.py:81 fields.py:84
 msgid "There is no user with this username."
 msgstr "Il n'y a pas d'utilisateur avec ce nom d'utilisateur."
 
-#: forms.py:27
-#: models.py:86
-#: templates/django_messages/inbox.html:8
+#: forms.py:27 models.py:86 templates/django_messages/inbox.html:8
 #: templates/django_messages/outbox.html:8
 #: templates/django_messages/trash.html:8
 #: templates/django_messages/view.html:6
 msgid "Subject"
 msgstr "Sujet"
 
-#: forms.py:28
-#: models.py:87
+#: forms.py:28 models.py:87
 msgid "Body"
 msgstr "Message"
 
@@ -76,7 +71,9 @@ msgstr "Utilisateur inconnu"
 #: forms.py:50
 #, python-format
 msgid "%(recipient)s has blacklisted you, you can't message him any more."
-msgstr "%(recipient)s vous a mis dans sa liste noire, vous ne pouvez plus lui envoyer de messages."
+msgstr ""
+"%(recipient)s vous a mis dans sa liste noire, vous ne pouvez plus lui "
+"envoyer de messages."
 
 #: management.py:9
 msgid "Message Received"
@@ -126,8 +123,7 @@ msgstr "Message Récupéré"
 msgid "you have undeleted a message"
 msgstr "vous avez récupéré un message"
 
-#: models.py:88
-#: templates/django_messages/inbox.html:8
+#: models.py:88 templates/django_messages/inbox.html:8
 #: templates/django_messages/trash.html:8
 #: templates/django_messages/view.html:8
 msgid "Sender"
@@ -179,8 +175,7 @@ msgstr ""
 msgid "New Message: %(subject)s"
 msgstr "Nouveau message: %(subject)s"
 
-#: views.py:82
-#: views.py:120
+#: views.py:82 views.py:120
 msgid "Message successfully sent."
 msgstr "Message envoyé avec succès."
 
@@ -293,8 +288,12 @@ msgid "undelete"
 msgstr "restaurer"
 
 #: templates/django_messages/trash.html:27
-msgid "Deleted Messages are removed from the trash at unregular intervals, don't rely on this feature for long-time storage."
-msgstr "Les Messages Effacés sont enlevé de la poubelle a intervalles irréguliers, ne comptez pas sur cette fonctionnalité pour du stockage à long terme."
+msgid ""
+"Deleted Messages are removed from the trash at unregular intervals, don't "
+"rely on this feature for long-time storage."
+msgstr ""
+"Les Messages Effacés sont enlevé de la poubelle a intervalles irréguliers, "
+"ne comptez pas sur cette fonctionnalité pour du stockage à long terme."
 
 #: templates/django_messages/view.html:4
 msgid "View Message"
@@ -306,52 +305,74 @@ msgstr "Effacer"
 
 #: templates/notification/messages_deleted/notice.html:1
 #, python-format
-msgid "You have deleted the message <a href=\"%(message_url)s\">%(message)s</a>."
-msgstr "Vous avez effacé le message <a href=\"%(message_url)s\">%(message)s</a>."
+msgid ""
+"You have deleted the message <a href=\"%(message_url)s\">%(message)s</a>."
+msgstr ""
+"Vous avez effacé le message <a href=\"%(message_url)s\">%(message)s</a>."
 
 #: templates/notification/messages_received/notice.html:2
 #, python-format
-msgid "You have received the message <a href=\"%(message_url)s\">%(message)s</a> from %(message_sender)s."
-msgstr "Vous avez reçu le message <a href=\"%(message_url)s\">%(message)s</a> de %(message_sender)s."
+msgid ""
+"You have received the message <a href=\"%(message_url)s\">%(message)s</a> "
+"from %(message_sender)s."
+msgstr ""
+"Vous avez reçu le message <a href=\"%(message_url)s\">%(message)s</a> de %"
+"(message_sender)s."
 
 #: templates/notification/messages_recovered/notice.html:1
 #, python-format
-msgid "You have recovered the message <a href=\"%(message_url)s\">%(message)s</a>."
-msgstr "Vous avez récupéré le message <a href=\"%(message_url)s\">%(message)s</a>."
+msgid ""
+"You have recovered the message <a href=\"%(message_url)s\">%(message)s</a>."
+msgstr ""
+"Vous avez récupéré le message <a href=\"%(message_url)s\">%(message)s</a>."
 
 #: templates/notification/messages_replied/notice.html:2
 #, python-format
-msgid "You have replied to <a href=\"%(message_url)s\">%(message_parent_msg)s</a> from %(message_recipient)s."
-msgstr "Vous avez répondu à <a href=\"%(message_url)s\">%(message_parent_msg)s</a> de %(message_recipient)s."
+msgid ""
+"You have replied to <a href=\"%(message_url)s\">%(message_parent_msg)s</a> "
+"from %(message_recipient)s."
+msgstr ""
+"Vous avez répondu à <a href=\"%(message_url)s\">%(message_parent_msg)s</a> "
+"de %(message_recipient)s."
 
 #: templates/notification/messages_reply_received/notice.html:2
 #, python-format
 msgid "%(message_sender)s has sent you a reply to %(message_parent_msg)s."
-msgstr "%(message_sender)s vous a envoyé une réponse à  %(message_parent_msg)s."
+msgstr ""
+"%(message_sender)s vous a envoyé une réponse à  %(message_parent_msg)s."
 
 #: templates/notification/messages_sent/notice.html:2
 #, python-format
-msgid "You have sent the message <a href=\"%(message_url)s\">%(message)s</a> to %(message_recipient)s."
-msgstr "Vous avez envoyé le message <a href=\"%(message_url)s\">%(message)s</a> à %(message_recipient)s."
+msgid ""
+"You have sent the message <a href=\"%(message_url)s\">%(message)s</a> to %"
+"(message_recipient)s."
+msgstr ""
+"Vous avez envoyé le message <a href=\"%(message_url)s\">%(message)s</a> à %"
+"(message_recipient)s."
 
 #~ msgid "New Message:"
 #~ msgstr "Nouveau Message:"
+
 #~ msgid "You have deleted the message '%(message)s'."
 #~ msgstr "Vous avez effacé le message '%(message)s'."
+
 #~ msgid "You have received a message from %(message_sender)s."
 #~ msgstr "Vous avez reçu un message de %(message_sender)s."
+
 #~ msgid "You have recovered the message '%(message)s'."
 #~ msgstr "vous avez récupéré le message '%(message)s'."
+
 #~ msgid ""
 #~ "You have replied to '%(message_parent_msg)s' from %(message_recipient)s."
 #~ msgstr ""
 #~ "Vous avez répondu à  '%(message_parent_msg)s' de %(message_recipient)s."
+
 #~ msgid ""
 #~ "<a href=\"%(sender_url)s\">%(message_sender)s</a> has sent you a reply to "
 #~ "'<a href=\"%(message_url)s\">%(message_parent_msg)s</a>'."
 #~ msgstr ""
 #~ "<a href=\"%(sender_url)s\">%(message_sender)s</a> vous a envoyé une "
 #~ "réponse à '<a href=\"%(message_url)s\">%(message_parent_msg)s</a>'."
+
 #~ msgid "You have sent the message '%(message)s' to %(message_recipient)s."
 #~ msgstr "Vous avez envoyé le message '%(message)s' à %(message_recipient)s."
-
