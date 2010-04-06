@@ -128,11 +128,9 @@ def reply(request, message_id, form_class=ComposeForm,
     }, context_instance=RequestContext(request))
 reply = login_required(reply)
 
-def delete(request, conversation_id, 
-    success_url=None, 
-    *args, **kwargs):
+def delete(request, success_url=None, *args, **kwargs):
     """
-    Marks a conversation as deleted. The messages are not
+    Marks conversation(s) as deleted. The messages are not
     really removed from the database, because two users must delete a message
     before it's safe to remove it completely. 
     A cron-job should prune the database and remove old messages which are 
@@ -143,55 +141,53 @@ def delete(request, conversation_id,
     page (e.g. `/foo/bar/`) than ``success_url`` after deletion of the 
     conversation.
     """
-    user = request.user
-    now = datetime.datetime.now()
-    queryset = Message.objects.get_conversation(conversation=conversation_id)
-    conversation = get_list_or_404(queryset)
-    deleted = False
-    if success_url is None:
-        success_url = reverse('messages_inbox')
-    if request.GET.has_key('next'):
-        success_url = request.GET['next']
-    # FIXME: is there a clean way to combine those 2 requests in one ?
-    result1 = queryset.filter(recipient=user).update(recipient_deleted_at=now)
-    result2 = queryset.filter(sender=user).update(sender_deleted_at=now)
-    if result1 or result2:
-        deleted = True    
-    if deleted:
-        user.message_set.create(message=_(u"Message successfully deleted."))
-        if notification:
-            notification.send([user], "messages_deleted", {'message': message,})
-        return HttpResponseRedirect(success_url)
+    if request.method == 'POST' and 'ids' in request.POST:
+        user = request.user
+        now = datetime.datetime.now()
+        ids = request.POST.getlist('ids')
+        queryset = Message.objects.get_conversations(conversations=ids)
+        conversation = get_list_or_404(queryset)
+        deleted = False
+        if success_url is None:
+            success_url = reverse('messages_inbox')
+        if request.GET.has_key('next'):
+            success_url = request.GET['next']
+        # FIXME: is there a clean way to combine those 2 requests in one ?
+        result1 = queryset.filter(recipient=user).update(recipient_deleted_at=now)
+        result2 = queryset.filter(sender=user).update(sender_deleted_at=now)
+        if result1 or result2:
+            deleted = True    
+        if deleted:
+            user.message_set.create(message=_(u"Conversation successfully deleted."))
+            return HttpResponseRedirect(success_url)
     raise Http404
 delete = login_required(delete)
 
-def undelete(request, conversation_id,
-    success_url=None, 
-    *args, **kwargs):
+def undelete(request, success_url=None, **kwargs):
     """
-    Recovers a conversation from trash. This is achieved by removing the
+    Recovers conversation(s) from trash. This is achieved by removing the
     ``(sender|recipient)_deleted_at`` from the model.
     """
-    user = request.user
-    queryset = Message.objects.get_conversation(conversation=conversation_id)
-    undeleted = False
-    if success_url is None:
-        success_url = reverse('messages_inbox')
-    if request.GET.has_key('next'):
-        success_url = request.GET['next']
-    
-    # FIXME: is there a clean way to combine those 2 requests in one ?
-    # FIXME: refactor, it's very similar to delete()
-    result1 = queryset.filter(recipient=user).update(recipient_deleted_at=None)
-    result2 = queryset.filter(sender=user).update(sender_deleted_at=None)
-    if result1 or result2:
-       undeleted = True    
+    if request.method == 'POST' and 'ids' in request.POST:
+        user = request.user
+        ids = request.POST.getlist('ids')
+        queryset = Message.objects.get_conversations(conversations=ids)
+        undeleted = False
+        if success_url is None:
+            success_url = reverse('messages_inbox')
+        if request.GET.has_key('next'):
+            success_url = request.GET['next']
         
-    if undeleted:
-        user.message_set.create(message=_(u"Message successfully recovered."))
-        if notification:
-            notification.send([user], "messages_recovered", {'message': message,})
-        return HttpResponseRedirect(success_url)
+        # FIXME: is there a clean way to combine those 2 requests in one ?
+        # FIXME: refactor, it's very similar to delete()
+        result1 = queryset.filter(recipient=user).update(recipient_deleted_at=None)
+        result2 = queryset.filter(sender=user).update(sender_deleted_at=None)
+        if result1 or result2:
+           undeleted = True    
+            
+        if undeleted:
+            user.message_set.create(message=_(u"Conversation successfully recovered."))
+            return HttpResponseRedirect(success_url)
     raise Http404
 undelete = login_required(undelete)
     

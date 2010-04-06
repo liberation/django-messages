@@ -77,6 +77,16 @@ class MessageManager(models.Manager):
         return self.related.filter(
             conversation=conversation
         ).order_by('sent_at')
+        
+    def get_conversations(self, conversations):
+        """
+        Returns specific conversations. We don't filter by user here,
+        since we have the conversations id. The view should check the 
+        recipient/sender fields if necessary.        
+        """
+        return self.related.filter(
+            conversation__in=conversations
+        ).order_by('sent_at')
 
 
 class Message(models.Model):
