@@ -88,9 +88,10 @@ def compose(request, recipient=None, form_class=ComposeForm,
     else:
         form = form_class()
         if recipient is not None:
-            recipients = User.objects.filter(username=recipient)
-            if recipients:
-                form.fields['recipient'].initial = recipients[0]
+            try:
+                form.fields['recipient'].initial = User.objects.get(username=recipient)
+            except:
+                return HttpResponseRedirect(reverse('messages_compose'))
     return render_to_response(template_name, {
         'form': form,
     }, context_instance=RequestContext(request))
