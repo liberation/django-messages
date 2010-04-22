@@ -81,7 +81,7 @@ def compose(request, recipient=None, form_class=ComposeForm,
             request.user.message_set.create(
                 message=_(u"Message successfully sent."))
             if success_url is None:
-                success_url = reverse('messages_inbox')
+                success_url = reverse('messages_outbox')
             if request.GET.has_key('next'):
                 success_url = request.GET['next']
             return HttpResponseRedirect(success_url)
@@ -119,7 +119,7 @@ def reply(request, message_id, form_class=ComposeForm,
             request.user.message_set.create(
                 message=_(u"Message successfully sent."))
             if success_url is None:
-                success_url = reverse('messages_inbox')
+                success_url = reverse('messages_outbox')
             return HttpResponseRedirect(success_url)
     else:
         form = form_class(data)
