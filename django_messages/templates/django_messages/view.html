@@ -2,20 +2,40 @@
 {% load i18n %} 
 {% block content %}
 <h1>{% trans "View Message" %}</h1>
-<dl class="message-headers">
-    <dt>{% trans "Subject" %}</dt>
-    <dd><strong>{{ message.subject }}</strong></dd>
-    <dt>{% trans "Sender" %}</dt>
-    <dd>{{ message.sender }}</dd>
-    <dt>{% trans "Date" %} </dt>
-    <dd>{{ message.sent_at|date:_("DATETIME_FORMAT")}}</dd>
-    <dt>{% trans "Recipient" %}</dt>
-    <dd>{{ message.recipient }}</dd>
-</dl>
-{{ message.body|linebreaksbr }}<br /><br />
-
-{% ifequal message.recipient.pk user.pk %}
-<a href="{% url messages_reply message.id %}">{% trans "Reply" %}</a>
-{% endifequal %}
-<a href="{% url messages_delete message.id %}">{% trans "Delete" %}</a>
+{% for message in conversation %}
+    {% if forloop.first %}
+        <h1>Sujet de la discussion : {{ message.subject }}</h1>
+        <h2>Discussion entre {{ message.sender }} et {{ message.recipient }}</h2>
+        <ul id="thread" class="blockInbox">
+    {% endif %}
+    <dl class="message-headers">
+        <dt>{% trans "Subject" %}</dt>
+        <dd><strong>{{ message.subject }}</strong></dd>
+        <dt>{% trans "Sender" %}</dt>
+        <dd>{{ message.sender }}</dd>
+        <dt>{% trans "Date" %} </dt>
+        <dd>{{ message.sent_at|date:_("DATETIME_FORMAT")}}</dd>
+        <dt>{% trans "Recipient" %}</dt>
+        <dd>{{ message.recipient }}</dd>
+    </dl>
+    {{ message.body|linebreaksbr }}<br /><br />
+    {% if forloop.last %}
+        <form action="{% url messages_delete %}" method="post">
+        <p>
+            <input type="hidden" name="ids" value="{{ message.conversation_id }}" />
+            {% csrf_token %}<input type="submit" name="submit" value="{% trans 'Delete this conversation' %}" />
+        </p>
+        </form>
+        <hr />
+        <form action="{% url messages_reply message.id %}" method="post">
+        <h2> {% trans "Reply" %} </h2>
+        <p>
+            {{ form.body }}
+        </p>
+        <p>
+            {% csrf_token %}<input type="submit" value="{% trans 'Reply' %}"/>
+        </p>
+        </form>
+    {% endif %}
+{% endfor %}
 {% endblock %}
