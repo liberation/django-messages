@@ -5,11 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django.contrib.auth.models import User
 
-if "notification" in settings.INSTALLED_APPS:
-    from notification import models as notification
-else:
-    notification = None
-
 if "relationships" in settings.INSTALLED_APPS:
     from relationships.models import RelationshipStatus
     relationships = True
@@ -78,11 +73,4 @@ class ComposeForm(forms.Form):
                 msg.conversation = msg
                 msg.save()
             message_list.append(msg)
-            if notification:
-                if parent_msg is not None:
-                    notification.send([self.sender], "messages_replied", {'message': msg,})
-                    notification.send([r], "messages_reply_received", {'message': msg,})
-                else:
-                    notification.send([self.sender], "messages_sent", {'message': msg,})
-                    notification.send([r], "messages_received", {'message': msg,})
         return message_list
