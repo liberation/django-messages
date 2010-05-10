@@ -5,10 +5,10 @@
 <h1>{% trans "Inbox" %}</h1>
 {% autopaginate conversations %}
 {% if conversations %}
-<form action="{% url messages_delete %}" method="post" id="f_messages_delete">
+<form action="{% url messages_delete %}" method="post" id="f_messages_delete">{% csrf_token %}
     <ul>
         <li><a href="#">{% trans "Select all" %}</a></li>  {# FIXME #}
-        <li><input type="submit" name="submit" value="{% trans 'Delete selected conversation(s)' %}" />{% csrf_token %}</li>
+        <li><input type="submit" name="submit" value="{% trans 'Delete selected conversation(s)' %}" /></li>
     </ul>
     <table class="messages">
         <thead>

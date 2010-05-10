@@ -20,20 +20,20 @@
     </dl>
     {{ message.body|linebreaksbr }}<br /><br />
     {% if forloop.last %}
-        <form action="{% url messages_delete %}" method="post">
+        <form action="{% url messages_delete %}" method="post">{% csrf_token %}
         <p>
             <input type="hidden" name="ids" value="{{ message.conversation_id }}" />
-            {% csrf_token %}<input type="submit" name="submit" value="{% trans 'Delete this conversation' %}" />
+            <input type="submit" name="submit" value="{% trans 'Delete this conversation' %}" />
         </p>
         </form>
         <hr />
-        <form action="{% url messages_reply message.id %}" method="post">
+        <form action="{% url messages_reply message.id %}" method="post">{% csrf_token %}
         <h2> {% trans "Reply" %} </h2>
         <p>
             {{ form.body }}
         </p>
         <p>
-            {% csrf_token %}<input type="submit" value="{% trans 'Reply' %}"/>
+            <input type="submit" value="{% trans 'Reply' %}"/>
         </p>
         </form>
     {% endif %}
