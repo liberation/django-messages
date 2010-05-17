@@ -123,7 +123,8 @@ class Message(models.Model):
         return self.subject
     
     def get_absolute_url(self):
-        return ('messages_detail', [self.conversation_id])
+        conversation_id = self.conversation_id or self.pk
+        return ('messages_detail', [str(conversation_id)])
     get_absolute_url = models.permalink(get_absolute_url)
     
     def save(self, **kwargs):
