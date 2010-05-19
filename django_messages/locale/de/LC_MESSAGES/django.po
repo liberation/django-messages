@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-09-11 12:31-0700\n"
+"POT-Creation-Date: 2010-05-19 16:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,54 +16,47 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: admin.py:13 forms.py:20 models.py:52 templates/messages/outbox.html:7
-#: templates/messages/view.html:12
-msgid "Recipient"
-msgstr "Empfänger"
-
-#: admin.py:15
-msgid "group"
-msgstr "Gruppe"
-
-#: admin.py:16
-msgid "Creates the message optionally for all users or a group of users."
-msgstr ""
-"Fügt die Nachricht wahlweise für jeden Benutzer der ausgewählten Gruppe "
-"hinzu."
-
-#: admin.py:23
-msgid "All users"
-msgstr "Alle Benutzer"
-
-#: admin.py:38 models.py:88
-msgid "Message"
-msgstr "Nachricht"
-
-#: admin.py:45
-msgid "Date/time"
-msgstr "Datum/Zeit"
-
-#: fields.py:53
+#: fields.py:60
 #, python-format
 msgid "The following usernames are incorrect: %(users)s"
 msgstr "Die folgenden Benutzernamen sind nicht korrekt: %(users)s"
 
-#: forms.py:21 models.py:49 templates/messages/inbox.html:7
-#: templates/messages/outbox.html:7 templates/messages/trash.html:7
-#: templates/messages/view.html:6
+#: fields.py:81 fields.py:84
+msgid "There is no user with this username."
+msgstr ""
+
+#: forms.py:21 models.py:99 templates/django_messages/outbox.html:15
+#: templates/django_messages/view.html:18
+msgid "Recipient"
+msgstr "Empfänger"
+
+#: forms.py:22 models.py:96 templates/django_messages/inbox.html:15
+#: templates/django_messages/outbox.html:15
+#: templates/django_messages/trash.html:15
+#: templates/django_messages/view.html:12
 msgid "Subject"
 msgstr "Betreff"
 
-#: forms.py:22 models.py:50
+#: forms.py:23 models.py:97
 msgid "Body"
 msgstr "Inhalt"
+
+#: forms.py:37
+msgid "Unknown user"
+msgstr ""
+
+#: forms.py:45
+#, python-format
+msgid "%(recipient)s has blacklisted you, you can't message him any more."
+msgstr ""
 
 #: management.py:9
 msgid "Message Received"
 msgstr "Nachricht erhalten"
 
 #: management.py:9
-msgid "you have received a message"
+#, fuzzy
+msgid "You have received a message"
 msgstr "Du hast eine Nachricht erhalten"
 
 #: management.py:10
@@ -71,7 +64,8 @@ msgid "Message Sent"
 msgstr "Nachricht gesendet"
 
 #: management.py:10
-msgid "you have sent a message"
+#, fuzzy
+msgid "You have sent a message"
 msgstr "Du hast eine Nachricht gesendet"
 
 #: management.py:11
@@ -79,7 +73,8 @@ msgid "Message Replied"
 msgstr "Nachricht beantwortet"
 
 #: management.py:11
-msgid "you have replied to a message"
+#, fuzzy
+msgid "You have replied to a message"
 msgstr "Du hast eine Nachricht beantwortet"
 
 #: management.py:12
@@ -87,68 +82,53 @@ msgid "Reply Received"
 msgstr "Antwort erhalten"
 
 #: management.py:12
-msgid "you have received a reply to a message"
+#, fuzzy
+msgid "You have received a reply to a message"
 msgstr "Du hast eine Antwort auf eine Nachricht erhalten"
 
-#: management.py:13
-msgid "Message Deleted"
-msgstr "Nachricht gelöscht"
-
-#: management.py:13
-msgid "you have deleted a message"
-msgstr "Du hast eine Nachricht gelöscht"
-
-#: management.py:14
-msgid "Message Recovered"
-msgstr "Nachricht wiederhergestellt"
-
-#: management.py:14
-msgid "you have undeleted a message"
-msgstr "Du hast eine Nachricht wiederhergestellt"
-
-#: models.py:51 templates/messages/inbox.html:7
-#: templates/messages/trash.html:7 templates/messages/view.html:8
+#: models.py:98 templates/django_messages/inbox.html:15
+#: templates/django_messages/trash.html:15
+#: templates/django_messages/view.html:14
 msgid "Sender"
 msgstr "Absender"
 
-#: models.py:53
+#: models.py:100
 msgid "Parent message"
 msgstr "Übergeordnete Nachricht"
 
-#: models.py:54
+#: models.py:101
+msgid "Conversation"
+msgstr ""
+
+#: models.py:102
 msgid "sent at"
 msgstr "gesendet am"
 
-#: models.py:55
+#: models.py:103
 msgid "read at"
 msgstr "gelesen am"
 
-#: models.py:56
+#: models.py:104
 msgid "replied at"
 msgstr "beantwortet am"
 
-#: models.py:57
+#: models.py:105
 msgid "Sender deleted at"
 msgstr "Vom Absender gelöscht"
 
-#: models.py:58
+#: models.py:106
 msgid "Recipient deleted at"
 msgstr "Vom Empfänger gelöscht"
 
-#: models.py:89
+#: models.py:137
+msgid "Message"
+msgstr "Nachricht"
+
+#: models.py:138
 msgid "Messages"
 msgstr "Nachrichten"
 
-#: utils.py:27
-#, python-format
-msgid "New Message: %(subject)s"
-msgstr "Neue Nachricht: %(subject)s"
-
-#: views.py:78 views.py:112
-msgid "Message successfully sent."
-msgstr "Nachricht erfolgreich gesendet."
-
-#: views.py:118
+#: utils.py:29
 #, python-format
 msgid ""
 "%(sender)s wrote:\n"
@@ -157,68 +137,87 @@ msgstr ""
 "%(sender)s schrieb:\n"
 "%(body)s"
 
-#: views.py:122
+#: utils.py:35
+#, python-format
+msgid "New Message: %(subject)s"
+msgstr "Neue Nachricht: %(subject)s"
+
+#: views.py:77 views.py:116
+msgid "Message successfully sent."
+msgstr "Nachricht erfolgreich gesendet."
+
+#: views.py:157
+#, fuzzy
+msgid "Conversation successfully deleted."
+msgstr "Nachricht erfolgreich gelöscht."
+
+#: views.py:185
+#, fuzzy
+msgid "Conversation successfully recovered."
+msgstr "Nachricht erfolgreich wiederhergestellt."
+
+#: views.py:201
 #, python-format
 msgid "Re: %(subject)s"
 msgstr "Re: %(subject)s"
 
-#: views.py:158
-msgid "Message successfully deleted."
-msgstr "Nachricht erfolgreich gelöscht."
-
-#: views.py:185
-msgid "Message successfully recovered."
-msgstr "Nachricht erfolgreich wiederhergestellt."
-
-#: templates/messages/base.html:8 templates/messages/inbox.html:4
-#: templates/messages/new_message.html:10
+#: templates/django_messages/base.html:8
+#: templates/django_messages/inbox.html:5
+#: templates/django_messages/new_message.html:10
 msgid "Inbox"
 msgstr "Posteingang"
 
-#: templates/messages/base.html:9 templates/messages/outbox.html:4
+#: templates/django_messages/base.html:9
+#: templates/django_messages/outbox.html:5
 msgid "Sent Messages"
 msgstr "Gesendete Nachrichten"
 
-#: templates/messages/base.html:10
+#: templates/django_messages/base.html:10
 msgid "New Message"
 msgstr "Neue Nachricht"
 
-#: templates/messages/base.html:11
+#: templates/django_messages/base.html:11
 msgid "Trash"
 msgstr "Papierkorb"
 
-#: templates/messages/compose.html:4
+#: templates/django_messages/compose.html:12
 msgid "Compose Message"
 msgstr "Nachricht verfassen"
 
-#: templates/messages/compose.html:9
+#: templates/django_messages/compose.html:17
 msgid "Send"
 msgstr "Senden"
 
-#: templates/messages/inbox.html:7
-msgid "Received"
-msgstr "Erhalten"
+#: templates/django_messages/inbox.html:10
+#: templates/django_messages/outbox.html:10
+#: templates/django_messages/trash.html:10
+msgid "Select all"
+msgstr ""
 
-#: templates/messages/inbox.html:7 templates/messages/outbox.html:7
-#: templates/messages/trash.html:7
-msgid "Action"
-msgstr "Aktion"
+#: templates/django_messages/inbox.html:11
+#: templates/django_messages/outbox.html:11
+msgid "Delete selected conversation(s)"
+msgstr ""
 
-#: templates/messages/inbox.html:19 templates/messages/outbox.html:16
-#: templates/messages/trash.html:16 templates/messages/view.html:11
+#: templates/django_messages/inbox.html:15
+#: templates/django_messages/outbox.html:15
+msgid "Sent"
+msgstr "Gesendet"
+
+#: templates/django_messages/inbox.html:29
+#: templates/django_messages/outbox.html:25
+#: templates/django_messages/trash.html:25
+#: templates/django_messages/view.html:17
 msgid "DATETIME_FORMAT"
 msgstr "j. N Y, H:i"
 
-#: templates/messages/inbox.html:20 templates/messages/outbox.html:17
-msgid "delete"
-msgstr "löschen"
-
-#: templates/messages/inbox.html:27 templates/messages/outbox.html:24
-#: templates/messages/trash.html:24
+#: templates/django_messages/inbox.html:37
+#: templates/django_messages/outbox.html:33
+#: templates/django_messages/trash.html:33
 msgid "No messages."
 msgstr "Keine Nachrichten."
 
-#: templates/messages/new_message.html:1
+#: templates/django_messages/new_message.html:1
 #, python-format
 msgid ""
 "Hello %(recipient)s,\n"
@@ -231,32 +230,31 @@ msgstr ""
 "du hast eine private Nachricht von %(sender)s mit\n"
 "dem folgenden Inhalt erhalten:"
 
-#: templates/messages/new_message.html:9
+#: templates/django_messages/new_message.html:9
 #, python-format
 msgid "Sent from %(site_url)s"
 msgstr "Gesendet von %(site_url)s"
 
-#: templates/messages/new_message.html:11 templates/messages/view.html:18
+#: templates/django_messages/new_message.html:11
+#: templates/django_messages/view.html:31
+#: templates/django_messages/view.html:36
 msgid "Reply"
 msgstr "Antworten"
 
-#: templates/messages/outbox.html:7
-msgid "Sent"
-msgstr "Gesendet"
-
-#: templates/messages/trash.html:4
+#: templates/django_messages/trash.html:5
 msgid "Deleted Messages"
 msgstr "Gelöschte Nachrichten"
 
-#: templates/messages/trash.html:7 templates/messages/view.html:10
+#: templates/django_messages/trash.html:11
+msgid "Undelete selected conversation(s)"
+msgstr ""
+
+#: templates/django_messages/trash.html:15
+#: templates/django_messages/view.html:16
 msgid "Date"
 msgstr "Datum"
 
-#: templates/messages/trash.html:17
-msgid "undelete"
-msgstr "wiederherstellen"
-
-#: templates/messages/trash.html:23
+#: templates/django_messages/trash.html:36
 msgid ""
 "Deleted Messages are removed from the trash at unregular intervals, don't "
 "rely on this feature for long-time storage."
@@ -264,13 +262,13 @@ msgstr ""
 "Gelöschte Nachrichten werden in unregelmäßigen Intervallen entfernt, verlass "
 "dich nicht drauf, dass diese Nachrichten hier lange gespeichert werden."
 
-#: templates/messages/view.html:4
+#: templates/django_messages/view.html:4
 msgid "View Message"
 msgstr "Nachrichtendetails"
 
-#: templates/messages/view.html:20
-msgid "Delete"
-msgstr "Löschen"
+#: templates/django_messages/view.html:26
+msgid "Delete this conversation"
+msgstr ""
 
 #: templates/notification/messages_deleted/notice.html:1
 #, python-format
@@ -319,3 +317,44 @@ msgid ""
 msgstr ""
 "Du hast die Nachricht <a href=\"%(message_url)s\">%(message)s</a> an %"
 "(message_recipient)s gesendet."
+
+#~ msgid "group"
+#~ msgstr "Gruppe"
+
+#~ msgid "Creates the message optionally for all users or a group of users."
+#~ msgstr ""
+#~ "Fügt die Nachricht wahlweise für jeden Benutzer der ausgewählten Gruppe "
+#~ "hinzu."
+
+#~ msgid "All users"
+#~ msgstr "Alle Benutzer"
+
+#~ msgid "Date/time"
+#~ msgstr "Datum/Zeit"
+
+#~ msgid "Message Deleted"
+#~ msgstr "Nachricht gelöscht"
+
+#~ msgid "you have deleted a message"
+#~ msgstr "Du hast eine Nachricht gelöscht"
+
+#~ msgid "Message Recovered"
+#~ msgstr "Nachricht wiederhergestellt"
+
+#~ msgid "you have undeleted a message"
+#~ msgstr "Du hast eine Nachricht wiederhergestellt"
+
+#~ msgid "Received"
+#~ msgstr "Erhalten"
+
+#~ msgid "Action"
+#~ msgstr "Aktion"
+
+#~ msgid "delete"
+#~ msgstr "löschen"
+
+#~ msgid "undelete"
+#~ msgstr "wiederherstellen"
+
+#~ msgid "Delete"
+#~ msgstr "Löschen"
