@@ -32,6 +32,9 @@ class ComposeForm(forms.Form):
         if sender:
             self.sender = sender
             
+    def clean_subject(self):
+        return self.cleaned_data['subject'][:120]
+            
     def clean(self):
         if not self.sender:
             raise forms.ValidationError(_(u"Unknown user")) 
