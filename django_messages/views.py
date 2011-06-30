@@ -205,7 +205,7 @@ def _get_form_data_and_check_parent(request, parent, quote=format_quote):
     return data
 
 def view(request, conversation_id, 
-    form_class=ComposeForm,
+    form_class=ComposeForm, quote=format_quote,
     template_name='django_messages/view.html',
     *args, **kwargs):
     """
@@ -221,7 +221,7 @@ def view(request, conversation_id,
         raise Http404
     
     # FIXME: will force query evaluation. Is that a problem ?
-    data = _get_form_data_and_check_parent(request, conversation[len(conversation) - 1])
+    data = _get_form_data_and_check_parent(request, conversation[len(conversation) - 1], quote)
     
     # FIXME This might be costly, since read_at is not indexed
     now = datetime.datetime.now()
