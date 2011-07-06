@@ -75,5 +75,5 @@ class ComposeForm(forms.Form):
             if not msg.conversation:
                 msg.conversation = msg
                 msg.save()
-            message_list.append(msg)
+            message_list.append(msg) # FIXME: this is not used
         return message_list
