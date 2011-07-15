@@ -94,7 +94,7 @@ compose = login_required(compose)
 
 def reply(request, message_id, form_class=ComposeForm,
         template_name='django_messages/compose.html', success_url=None, recipient_filter=None,
-        quote=format_quote, 
+        quote=None, 
         *args, **kwargs):
     """
     Prepares the ``form_class`` form for writing a reply to a given message
@@ -102,6 +102,8 @@ def reply(request, message_id, form_class=ComposeForm,
     ``messages.utils`` (there is also format_linebreaks_quote defined) to pre-format
     the quote by default but you can use different formater.
     """
+    if not quote:
+        quote = getattr(settings, 'DJANGO_MESSAGES_QUOTE', format_quote)
     parent = get_object_or_404(Message, id=message_id)
     data = _get_form_data_and_check_parent(request, parent, quote)
     
@@ -187,7 +189,7 @@ def undelete(request, success_url=None, **kwargs):
     raise Http404
 undelete = login_required(undelete)
     
-def _get_form_data_and_check_parent(request, parent, quote=format_quote):
+def _get_form_data_and_check_parent(request, parent, quote):
     if parent.sender != request.user and parent.recipient != request.user:
         raise Http404
     
@@ -205,7 +207,7 @@ def _get_form_data_and_check_parent(request, parent, quote=format_quote):
     return data
 
 def view(request, conversation_id, 
-    form_class=ComposeForm, quote=format_quote,
+    form_class=ComposeForm, quote=None,
     template_name='django_messages/view.html',
     *args, **kwargs):
     """
@@ -219,6 +221,9 @@ def view(request, conversation_id,
     conversation = Message.objects.get_conversation(conversation=conversation_id)
     if not conversation:
         raise Http404
+        
+    if not quote:
+        quote = getattr(settings, 'DJANGO_MESSAGES_QUOTE', format_quote)
     
     # FIXME: will force query evaluation. Is that a problem ?
     data = _get_form_data_and_check_parent(request, conversation[len(conversation) - 1], quote)
