@@ -81,7 +81,7 @@ def compose(request, recipient=None, form_class=ComposeForm,
                 success_url = request.GET['next']
             return HttpResponseRedirect(success_url)
     else:
-        form = form_class()
+        form = form_class(sender=request.user)
         if recipient is not None:
             try:
                 form.fields['recipient'].initial = User.objects.get(username=recipient)
@@ -118,7 +118,7 @@ def reply(request, message_id, form_class=ComposeForm,
                 success_url = reverse('messages_outbox')
             return HttpResponseRedirect(success_url)
     else:
-        form = form_class(data)
+        form = form_class(data, sender=request.user)
     return render_to_response(template_name, {
         'form': form,
     }, context_instance=RequestContext(request))
@@ -229,6 +229,6 @@ def view(request, conversation_id,
 
     return render_to_response(template_name, {
         'conversation': conversation,
-        'form' : form_class(data),
+        'form' : form_class(data, sender=request.user),
     }, context_instance=RequestContext(request))
 view = login_required(view)
