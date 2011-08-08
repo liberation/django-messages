@@ -72,11 +72,11 @@ def compose(request, recipient=None, form_class=ComposeForm,
     if request.method == "POST":
         form = form_class(request.POST, recipient_filter=recipient_filter, sender=request.user)
         if form.is_valid():
-            form.save()
+            msg = form.save()
             request.user.message_set.create(
                 message=_(u"Message successfully sent."))
             if success_url is None:
-                success_url = reverse('messages_outbox')
+                success_url = reverse('messages_detail', kwargs={'conversation_id' : msg.conversation_id})
             if request.GET.has_key('next'):
                 success_url = request.GET['next']
             return HttpResponseRedirect(success_url)
@@ -113,11 +113,11 @@ def reply(request, message_id, form_class=ComposeForm,
         postdata["subject"] = data["subject"]
         form = form_class(postdata, recipient_filter=recipient_filter, sender=request.user)
         if form.is_valid():
-            form.save(parent_msg=parent)
+            msg = form.save(parent_msg=parent)
             request.user.message_set.create(
                 message=_(u"Message successfully sent."))
             if success_url is None:
-                success_url = reverse('messages_outbox')
+                success_url = reverse('messages_detail', kwargs={'conversation_id' : msg.conversation_id})
             return HttpResponseRedirect(success_url)
     else:
         form = form_class(data, sender=request.user)

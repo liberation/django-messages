@@ -54,7 +54,6 @@ class ComposeForm(forms.Form):
         recipient = self.cleaned_data['recipient']
         subject = self.cleaned_data['subject']
         body = self.cleaned_data['body']
-        message_list = []
         # for r in recipients:
         r = recipient
         if True:
@@ -75,5 +74,4 @@ class ComposeForm(forms.Form):
             if not msg.conversation:
                 msg.conversation = msg
                 msg.save()
-            message_list.append(msg) # FIXME: this is not used
-        return message_list
+        return msg
