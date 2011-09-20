@@ -192,6 +192,12 @@ undelete = login_required(undelete)
 def _get_form_data_and_check_parent(request, parent, quote):
     if parent.sender != request.user and parent.recipient != request.user:
         raise Http404
+
+    if parent.sender == request.user and parent.sender_deleted_at:
+        raise Http404
+
+    if parent.recipient == request.user and parent.recipient_deleted_at:
+        raise Http404
     
     if parent.sender == request.user:
         recipient = parent.recipient
@@ -218,7 +224,7 @@ def view(request, conversation_id,
     If the user is the recipient and the message is unread 
     ``read_at`` is set to the current datetime.
     """
-    conversation = Message.objects.get_conversation(conversation=conversation_id)
+    conversation = Message.objects.get_conversation(conversation_id)
     if not conversation:
         raise Http404
         
