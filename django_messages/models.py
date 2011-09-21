@@ -1,7 +1,8 @@
 import datetime
+
 from django.db import models
 from django.conf import settings
-from django.db.models import signals, Max
+from django.db.models import signals, Max, Q
 from django.db.models.query import QuerySet
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
@@ -57,16 +58,12 @@ class MessageManager(models.Manager):
         Return Trash by filtering conversations containing messages 
         sent by given user that were deleted
         """
-        tmp = self._conversations.filter(
-                sender=user,
-                sender_deleted_at__isnull=False,
-        ) | self._conversations.filter(
-                recipient=user,
-                recipient_deleted_at__isnull=False,
-        )
-        return self.related.filter(
-            id__in=tmp
-        )
+        hide_messages_after = getattr(settings, 'HIDE_DELETED_MESSAGES_AFTER', 1)
+        interval = datetime.date.today() - datetime.timedelta(days=hide_messages_after)
+        q1 = Q(sender=user, sender_deleted_at__gte=interval)
+        q2 = Q(sender=user, sender_deleted_at__gte=interval)
+        ids = self._conversations.filter(q1 | q2)
+        return self.related.filter(id__in=ids)
         
     def get_conversation(self, conversation):
         """
