@@ -9,31 +9,6 @@ from django.conf import settings
 from django_messages.models import Message
 
 
-class DeleteTestCase(TestCase):
-    def setUp(self):
-        self.user1 = User.objects.create_user('user3', 'user3@example.com', '123456')
-        self.user2 = User.objects.create_user('user4', 'user4@example.com', '123456')
-        self.msg1 = Message(sender=self.user1, recipient=self.user2, subject='Subject Text 1', body='Body Text 1')
-        self.msg2 = Message(sender=self.user1, recipient=self.user2, subject='Subject Text 2', body='Body Text 2')
-        self.msg1.sender_deleted_at = datetime.datetime.now()
-        self.msg2.recipient_deleted_at = datetime.datetime.now()
-        self.msg1.save()
-        self.msg2.save()
-                
-    def testBasic(self):
-        self.assertEquals(Message.objects.outbox_for(self.user1).count(), 1)
-        self.assertEquals(Message.objects.outbox_for(self.user1)[0].subject, 'Subject Text 2')
-        self.assertEquals(Message.objects.inbox_for(self.user2).count(),1)
-        self.assertEquals(Message.objects.inbox_for(self.user2)[0].subject, 'Subject Text 1')
-        #undelete
-        self.msg1.sender_deleted_at = None
-        self.msg2.recipient_deleted_at = None
-        self.msg1.save()
-        self.msg2.save()
-        self.assertEquals(Message.objects.outbox_for(self.user1).count(), 2)
-        self.assertEquals(Message.objects.inbox_for(self.user2).count(),2)
-
-
 class TestCleanDeletedMessages(TestCase):
 
     def call_clean_deleted_messages_command(self, dryrun=False):
