@@ -1,21 +1,9 @@
 from datetime import datetime
 
-from django.test import TestCase
 from django.contrib.auth.models import User
 from django_messages.models import Message, inbox_count_for
 
-class DjangoMessagesTestCase(TestCase):
-   
-    def send_message(self, sender, recipient, parent=None):
-        msg = Message(
-            sender=sender,
-            recipient=recipient,
-            subject='Subject Text',
-            body='Body Text',
-            parent_msg=parent,
-        )
-        msg.save()
-        return msg
+from utils import DjangoMessagesTestCase
 
 
 class MessageTests(DjangoMessagesTestCase):
