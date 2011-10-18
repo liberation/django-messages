@@ -160,8 +160,4 @@ class ManagerTests(DjangoMessagesTestCase):
         conversations = Message.objects.get_conversations((conversation1, conversation2))
         count = conversations.count()
         self.assertEquals(count, 12)
-        
-        for message in conversations[1:]:
-            self.assertTrue(message.sent_at >= sent_at)
-            sent_at = message.sent_at
 
