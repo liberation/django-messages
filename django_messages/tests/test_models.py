@@ -1,26 +1,34 @@
 from datetime import datetime
 
+from django.core import mail
 from django.contrib.auth.models import User
 from django_messages.models import Message, inbox_count_for
 
 from base import DjangoMessagesTestCase
 
+
 class MessageTests(DjangoMessagesTestCase):
 
     def setUp(self):
         self.skip_if_auth_not_installed()
-        self.user1 = User.objects.create_user('user1', 'user1@example.com', '123456')
-        self.user2 = User.objects.create_user('user2', 'user2@example.com', '123456')
-        self.user3 = User.objects.create_user('user3', 'user3@example.com', '123456')
+        self.skip_if_notification_not_installed()
+        self.user1 = User.objects.create_user(username='user1', email='user1@example.com', password='123456')
+        self.user2 = User.objects.create_user(username='user2', email='user2@example.com', password='123456')
+        self.user3 = User.objects.create_user(username='user3', email='user3@example.com', password='123456')
 
     def test_user_sent_messages(self):
         """Tests that a message sent by a user is available in ``sent_messages``
         property of the ``User`` model and only to the user who sent the message"""
+        mail.outbox = []
         msg = self.send_message(self.user1, self.user2)
 
         self.assertEquals(self.user1.sent_messages.all().count(), 1)
         self.assertEquals(self.user2.sent_messages.all().count(), 0)
+
         self.assertEquals(self.user3.sent_messages.all().count(), 0)
+
+        self.assertEquals(len(mail.outbox), 1)
+        mail.outbox = []
 
     def test_user_received_messages(self):
         """Tests that a message sent to a user is available in ``received_messages``
