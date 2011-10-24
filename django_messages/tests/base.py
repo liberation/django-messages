@@ -43,7 +43,7 @@ class BaseTestCase(TestCase):
             self.skipTest('django.contrib.auth urls are not hooked')
 
     def skip_if_notification_not_installed(self):
-        if not notifications_installed:
+        if not notification_installed:
             self.skipTest('Django-notification application should be installed')
 
     def skip_if_relationships_not_installed(self):
