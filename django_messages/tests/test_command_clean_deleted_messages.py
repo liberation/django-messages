@@ -1,20 +1,22 @@
 import datetime
 from time import time
 
-from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.conf import settings
 
 from django_messages.models import Message
 
+from base import BaseTestCase
 
-class TestCleanDeletedMessages(TestCase):
+
+class TestCleanDeletedMessages(BaseTestCase):
 
     def call_clean_deleted_messages_command(self, dryrun=False):
         call_command('clean_deleted_messages', dryrun=dryrun)
 
     def setUp(self):
+        self.skip_if_auth_not_installed()
         self.user1 = User.objects.create_user('user1', 'user1@example.com', '123456')
         self.user2 = User.objects.create_user('user2', 'user2@example.com', '123456')
         
