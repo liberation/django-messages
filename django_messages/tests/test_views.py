@@ -15,9 +15,9 @@ class ViewBaseTestCase(DjangoMessagesTestCase):
 
     def setUp(self):
         self.skip_if_auth_not_installed()
-        self.user1 = User.objects.create(username='user1', password='user1')
-        self.user2 = User.objects.create(username='user2', password='user2')
-        self.user3 = User.objects.create(username='user3', password='user3')
+        self.user1 = User.objects.create(username='user1', password='user1', email='user1@example.net')
+        self.user2 = User.objects.create(username='user2', password='user2', email='user2@example.net')
+        self.user3 = User.objects.create(username='user3', password='user3', email='user3@example.net')
 
         self.user1.set_password('user1')
         self.user1.save()
@@ -224,7 +224,7 @@ class ComposeViewTests(ViewBaseTestCase):
             - Wrong status code: the url named ``messages_compose`` exists but does
               not return a 200 status code. 
             - 
-        ."""
+        """
         self.client.login(username='user1', password='user1')
         response = self.client.get(self.target_url)
         self.assertEqual(response.status_code, 200)
@@ -272,7 +272,23 @@ class ComposeViewTests(ViewBaseTestCase):
         
         self.assertRedirects(response, redirect_url)
 
+    def test_get_with_recipient(self):
+        self.client.login(username='user1', password='user1')
+        subject = 'random subject for testing'
+        body = 'body body body body body body'
+        target_url = reverse('messages_compose_to', kwargs={'recipient': 'user2'})
+        response = self.client.get(target_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('user2', response.content)
 
+    def test_get_with_invalid_recipient(self):
+        self.client.login(username='user1', password='user1')
+        subject = 'random subject for testing'
+        body = 'body body body body body body'
+        target_url = reverse('messages_compose_to', kwargs={'recipient': 'jackson'})
+        response = self.client.get(target_url)
+        redirect_url = reverse('messages_compose')
+        self.assertRedirects(response, redirect_url)
 class ReplyViewTests(ViewBaseTestCase):
 
     def setUp(self):
