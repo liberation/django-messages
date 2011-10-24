@@ -6,12 +6,13 @@ from django_messages.models import Message
 from django.db import connection
 from django.conf import settings
 
-from utils import DjangoMessagesTestCase
+from base import DjangoMessagesTestCase
 
 
 class ManagerTests(DjangoMessagesTestCase):
 
     def setUp(self):
+        self.skip_if_auth_not_installed()
         self.user1 = User.objects.create_user('user1', 'user1@example.com', '123456')
         self.user2 = User.objects.create_user('user2', 'user2@example.com', '123456')
         self.user3 = User.objects.create_user('user3', 'user3@example.com', '123456')

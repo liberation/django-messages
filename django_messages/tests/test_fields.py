@@ -1,16 +1,17 @@
 from collections import namedtuple
 
 from django import forms
-from django.test import TestCase
 from django.contrib.auth.models import User
 from django_messages.fields import CommaSeparatedUserInput, BaseUserField
+
+from base import BaseTestCase
 
 
 MockUserObject = namedtuple('MockUserObject', ['username'])
 
 
-class CommaSeparatedUserInputTests(TestCase):
-    
+class CommaSeparatedUserInputTests(BaseTestCase):
+
     def test_render_widget_with_empty_value(self):
         widget = CommaSeparatedUserInput()
         input_name = 'recipient'
@@ -74,16 +75,17 @@ class CommaSeparatedUserInputTests(TestCase):
         self.assertEquals(expected_html, html)
 
 
-class CommaSeparatedUserFieldTests(TestCase):
+class CommaSeparatedUserFieldTests(BaseTestCase):
     pass # Not used in current django_messages
 
 
-class BaseUserFieldTests(TestCase):
+class BaseUserFieldTests(BaseTestCase):
     
     def setUp(self):
         self.field = BaseUserField()
     
     def test_no_such_user(self):
+        self.skip_if_auth_not_installed()
         with self.assertRaises(forms.ValidationError) as context_manager:
             self.field.clean('foobarbaz')
         exception = context_manager.exception
@@ -92,10 +94,12 @@ class BaseUserFieldTests(TestCase):
                           exception.messages[0])
         
     def test_user_exists(self):
+        self.skip_if_auth_not_installed()
         user = User.objects.create(username="foobarbaz")
         self.assertEquals(user, self.field.clean(user.username))
 
     def test_user_filtered(self):
+        self.skip_if_auth_not_installed()        
         user = User.objects.create(username="foobarbaz")
         def filter_all_users(username):
             return False

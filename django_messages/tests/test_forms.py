@@ -1,15 +1,16 @@
-from django.test import TestCase
-
 from django.contrib.auth.models import User
 
 from django_messages.forms import ComposeForm
 # django-relationships should, be installed if you want to run the tests
 from relationships.models import RelationshipStatus, Relationship
 
+from base import BaseTestCase
 
-class ComposeFormTests(TestCase):
+
+class ComposeFormTests(BaseTestCase):
 
     def setUp(self):
+        self.skip_if_auth_not_installed()
         self.user1 = User.objects.create(username="user 1")
         self.user2 = User.objects.create(username="user 2")
 
