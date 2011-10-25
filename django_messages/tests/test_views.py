@@ -15,15 +15,16 @@ class ViewBaseTestCase(DjangoMessagesTestCase):
 
     def setUp(self):
         self.skip_if_auth_not_installed()
-        self.user1 = User.objects.create(username='user1', password='user1', email='user1@example.net')
-        self.user2 = User.objects.create(username='user2', password='user2', email='user2@example.net')
-        self.user3 = User.objects.create(username='user3', password='user3', email='user3@example.net')
+        self.user1 = User.objects.create(username='user1', email='user1@example.net')
+        self.user2 = User.objects.create(username='user2', email='user2@example.net')
+        self.user3 = User.objects.create(username='user3', email='user3@example.net')
 
         self.user1.set_password('user1')
         self.user1.save()
         self.user2.set_password('user2')
         self.user2.save()
-
+        self.user3.set_password('user3')
+        self.user3.save()
 
 class InboxViewTests(ViewBaseTestCase):
 
@@ -289,6 +290,8 @@ class ComposeViewTests(ViewBaseTestCase):
         response = self.client.get(target_url)
         redirect_url = reverse('messages_compose')
         self.assertRedirects(response, redirect_url)
+
+
 class ReplyViewTests(ViewBaseTestCase):
 
     def setUp(self):
@@ -322,6 +325,25 @@ class ReplyViewTests(ViewBaseTestCase):
         )
         redirect_url = reverse('messages_detail', kwargs={'conversation_id' : self.message.conversation_id})
         self.assertRedirects(response, redirect_url)
+
+    def test_get_with_invalid_user(self):
+        """If an user not involved in the conversation should display a 404"""
+        self.client.login(username='user3', password='user3')
+        response = self.client.get(self.target_url)
+        self.assertEqual(404, response.status_code)
+
+    def test_post_with_invalid_user(self):
+        """If an user not involved in the conversation should display a 404"""
+        self.client.login(username='user3', password='user3')
+        subject = 'random subject for testing'
+        body = 'body body body body body body'
+        response = self.client.post(self.target_url, 
+            {
+                'subject': subject,
+                'body': body,
+            }
+        )
+        self.assertEqual(404, response.status_code)
 
 
 class DeleteViewTests(ViewBaseTestCase):
@@ -401,3 +423,39 @@ class UndeleteViewTests(ViewBaseTestCase):
         target_url = '%s?next=%s' % (self.target_url, next)
         response = self.client.post(target_url, {'ids': ids})
         self.assertRedirects(response, next)
+
+
+def ViewTests(ViewBaseTestCase):
+    """Conversation detail view tests, url endpoint is ``messages_detail``"""
+    def setUp(self):
+        """Create a conversation with one message and set ``self.target_url``"""
+        super(ViewTests, self).setUp()
+        message = self.send_message(self.user1, self.user2)
+        message.conversation = message
+        message.save()
+        self.target_url = reverse('messages_detail', args=(self.message.pk,))
+
+    def test_get_by_sender(self):
+        """The user that started a conversation can display the conversation"""
+        self.client.login(username='user1', password='user1')
+        response = self.client.get(self.target_url)
+        self.assertEqual(200, response.status_code)
+
+    def test_get_by_recipient(self):
+        """The user that is the recipient of the message can display the conversation"""
+        self.client.login(username='user2', password='user2')
+        response = self.client.get(self.target_url)
+        self.assertEqual(200, response.status_code)
+    
+    def test_get_by_someone_else(self):
+        """Someone not involved in the conversation cannot display the conversation"""
+        self.client.login(username='user3', password='user3')
+        response = self.client.get(self.target_url)
+        self.assertEqual(404, response.status_code)
+
+    def test_login_required(self):
+        response = self.client.get(self.target_url)
+        login_url = reverse('django.contrib.auth.views.login')
+        redirect_url = 'http://testserver%s?next=%s' % (login_url, self.target_url)
+        self.assertRedirects(response, redirect_url)
+
