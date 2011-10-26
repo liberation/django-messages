@@ -348,7 +348,8 @@ class ReplyViewTests(ViewBaseTestCase):
         self.assertEqual(404, response.status_code)
 
     def test_post_with_invalid_user(self):
-        """If an user not involved in the conversation should display a 404"""
+        """If an user not involved in the conversation should display a 404
+        and not store the message"""
         self.client.login(username='user3', password='user3')
         subject = 'random subject for testing'
         body = 'body body body body body body'
@@ -359,6 +360,7 @@ class ReplyViewTests(ViewBaseTestCase):
             }
         )
         self.assertEqual(404, response.status_code)
+        self.assertEqual(1, Message.objects.count())
 
 
 class DeleteViewTests(ViewBaseTestCase):
