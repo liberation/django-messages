@@ -26,6 +26,7 @@ class ViewBaseTestCase(DjangoMessagesTestCase):
         self.user3.set_password('user3')
         self.user3.save()
 
+
 class InboxViewTests(ViewBaseTestCase):
 
     def setUp(self):
@@ -39,6 +40,10 @@ class InboxViewTests(ViewBaseTestCase):
         self.assertRedirects(response, redirect_url)
 
     def test_content(self):
+        """Checks that the content of inbox is what we expect
+        
+        Messages are just those that user1 should receive and that their subject
+        is available in page"""
         self.skip_if_notification_urls_not_installed()
         self.skip_if_pagination_is_not_installed()
         self.skip_if_pagination_middleware_is_not_installed()
@@ -46,6 +51,7 @@ class InboxViewTests(ViewBaseTestCase):
 
         self.client.login(username='user1', password='user1')
 
+        # generate messages for user1, user2, user3
         messages = []
         for i in range(10):
             message = self.send_message(self.user2, self.user1)
@@ -67,8 +73,8 @@ class InboxViewTests(ViewBaseTestCase):
             message.conversation = message
             message.save()
 
-        
         response = self.client.get(self.target_url)
+        # self.user1 inbox messages
         conversations = response.context['conversations']
         conversations = sorted(conversations, key=lambda x : x.pk)
         messages = sorted(messages, key=lambda x: x.pk)
@@ -95,6 +101,7 @@ class OutboxViewTests(ViewBaseTestCase):
         self.assertRedirects(response, redirect_url)
 
     def test_content(self):
+        """Checks that only messages sent by ``self.user1`` are displayed"""
         self.skip_if_notification_urls_not_installed()
         self.skip_if_pagination_is_not_installed()
         self.skip_if_pagination_middleware_is_not_installed()
@@ -150,6 +157,7 @@ class TrashViewTests(ViewBaseTestCase):
         self.assertRedirects(response, redirect_url)
 
     def test_content(self):
+        """Test that only messages from user1 that were deleted are present in trash"""
         self.skip_if_notification_urls_not_installed()
         self.skip_if_pagination_is_not_installed()
         self.skip_if_pagination_middleware_is_not_installed()
@@ -258,6 +266,8 @@ class ComposeViewTests(ViewBaseTestCase):
         self.assertRedirects(response, redirect_url)
     
     def test_submit_redirect_next(self):
+        """Tests that after submit the user is redirected to next parameter provided
+        in query string"""
         self.client.login(username='user1', password='user1')
         subject = 'random subject for testing'
         body = 'body body body body body body'
@@ -274,6 +284,8 @@ class ComposeViewTests(ViewBaseTestCase):
         self.assertRedirects(response, redirect_url)
 
     def test_get_with_recipient(self):
+        """Checks that if the ``username`` argument is provided in the url, the 
+        form is filled with that username"""
         self.client.login(username='user1', password='user1')
         subject = 'random subject for testing'
         body = 'body body body body body body'
@@ -283,6 +295,8 @@ class ComposeViewTests(ViewBaseTestCase):
         self.assertIn('user2', response.content)
 
     def test_get_with_invalid_recipient(self):
+        """Checks that if the ``username`` provided is invalid the user is redirect
+        to vanilla form"""
         self.client.login(username='user1', password='user1')
         subject = 'random subject for testing'
         body = 'body body body body body body'
@@ -308,6 +322,7 @@ class ReplyViewTests(ViewBaseTestCase):
         self.assertRedirects(response, redirect_url)
 
     def test_get_with_proper_form(self):
+        """Integration test, form tests are done in ``test_forms``"""
         self.client.login(username='user1', password='user1')
         response = self.client.get(self.target_url)
         self.assertEqual(response.status_code, 200)
@@ -377,6 +392,8 @@ class DeleteViewTests(ViewBaseTestCase):
         self.assertIsNotNone(self.message.sender_deleted_at)
 
     def test_submit_redirect_next(self):
+        """Checks that after submition the user is redirect to next provided query
+        string parameter"""
         self.client.login(username='user1', password='user1')
         ids = [1,2,3,4,5,6,7,8,9]
         next = reverse('messages_outbox')
@@ -417,6 +434,7 @@ class UndeleteViewTests(ViewBaseTestCase):
         self.assertIsNone(self.message.sender_deleted_at)
 
     def test_submit_redirect_next(self):
+        """Checks that user is redirected after submition to next query string parameter"""
         self.client.login(username='user1', password='user1')
         ids = [self.message.pk]
         next = reverse('messages_outbox')

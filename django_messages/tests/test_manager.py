@@ -54,6 +54,7 @@ class ManagerTests(DjangoMessagesTestCase):
         self.assertEquals(Message.objects.inbox_for(self.user3).count(), 0)
         
     def test_inbox_for_user_without_deleted_messages(self):
+        """Tests that deleted messages aren't display in inbox"""
         msg = self.send_message(self.user1, self.user2)
         msg.recipient_deleted_at = datetime.now()
         msg.save()
