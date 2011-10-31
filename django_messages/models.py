@@ -58,10 +58,8 @@ class MessageManager(models.Manager):
         Return Trash by filtering conversations containing messages 
         sent by given user that were deleted
         """
-        hide_messages_after = getattr(settings, 'HIDE_DELETED_MESSAGES_AFTER', 1)
-        interval = datetime.date.today() - datetime.timedelta(days=hide_messages_after)
-        q1 = Q(sender=user, sender_deleted_at__gte=interval)
-        q2 = Q(recipient=user, recipient_deleted_at__gte=interval)
+        q1 = Q(sender=user, sender_deleted_at__isnull=False)
+        q2 = Q(recipient=user, recipient_deleted_at__isnull=False)
         ids = self._conversations.filter(q1 | q2)
         return self.related.filter(id__in=ids)
         

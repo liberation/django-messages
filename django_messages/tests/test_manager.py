@@ -78,7 +78,6 @@ class ManagerTests(DjangoMessagesTestCase):
         msg = self.send_message(self.user1, self.user2)
         msg.recipient_deleted_at = datetime.now()
         msg.save()
-        settings.HIDE_DELETED_MESSAGES_AFTER = 999
         self.assertEquals(Message.objects.trash_for(self.user2).count(), 1)
         self.assertEquals(Message.objects.trash_for(self.user1).count(), 0)
         self.assertEquals(Message.objects.trash_for(self.user3).count(), 0)
@@ -88,25 +87,9 @@ class ManagerTests(DjangoMessagesTestCase):
         msg = self.send_message(self.user1, self.user2)
         msg.sender_deleted_at = datetime.now()
         msg.save()
-        settings.HIDE_DELETED_MESSAGES_AFTER = 999
         self.assertEquals(Message.objects.trash_for(self.user2).count(), 0)
         self.assertEquals(Message.objects.trash_for(self.user1).count(), 1)
         self.assertEquals(Message.objects.trash_for(self.user3).count(), 0)
-
-    def test_trash_do_not_show_old_messages(self):
-        """Tests that a deleted item is only available to the user that deleted it"""
-        msg = self.send_message(self.user1, self.user2)
-        settings.HIDE_DELETED_MESSAGES_AFTER = 999
-        old_enough = datetime.now() - timedelta(days=1000)
-        
-        # both user deleted the message
-        msg.recipient_deleted_at = old_enough
-        msg.sender_deleted_at = old_enough
-        msg.save()
-        
-        # both user should have an empty trash
-        self.assertEquals(Message.objects.trash_for(self.user2).count(), 0)
-        self.assertEquals(Message.objects.trash_for(self.user1).count(), 0)
 
     def test_get_conversation_one_message(self):
         conversation = self.send_message(self.user1, self.user2)
