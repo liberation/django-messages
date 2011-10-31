@@ -13,7 +13,7 @@ from base import BaseTestCase
 class TestCleanDeletedMessages(BaseTestCase):
 
     def call_clean_deleted_messages_command(self, dryrun=False):
-        call_command('clean_deleted_messages', dryrun=dryrun)
+        call_command('remove_deleted_messages', dryrun=dryrun)
 
     def setUp(self):
         self.skip_if_auth_not_installed()
