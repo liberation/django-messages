@@ -11,6 +11,7 @@ class ComposeFormTests(BaseTestCase):
 
     def setUp(self):
         self.skip_if_auth_not_installed()
+        self.skip_if_relationships_not_installed()
         self.user1 = User.objects.create(username="user 1")
         self.user2 = User.objects.create(username="user 2")
 

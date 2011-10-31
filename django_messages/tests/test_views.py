@@ -217,6 +217,11 @@ class ComposeViewTests(ViewBaseTestCase):
 
     def setUp(self):
         super(ComposeViewTests, self).setUp()
+        
+        #check dependencies
+        self.skip_if_pagination_is_not_installed()
+        self.skip_if_pagination_middleware_is_not_installed()
+        
         self.target_url = reverse('messages_compose')
 
     def test_login_required(self):
@@ -367,6 +372,11 @@ class DeleteViewTests(ViewBaseTestCase):
 
     def setUp(self):
         super(DeleteViewTests, self).setUp()
+        
+        #check dependencies
+        self.skip_if_pagination_middleware_is_not_installed()
+        self.skip_if_pagination_is_not_installed()
+        
         self.message = self.send_message(self.user1, self.user2)
         self.message.conversation = self.message
         self.message.save()
@@ -408,6 +418,10 @@ class UndeleteViewTests(ViewBaseTestCase):
 
     def setUp(self):
         super(UndeleteViewTests, self).setUp()
+        #check dependencies
+        self.skip_if_pagination_middleware_is_not_installed()
+        self.skip_if_pagination_is_not_installed()
+        
         self.message = self.send_message(self.user1, self.user2)
         self.message.conversation = self.message
         self.message.sender_deleted_at = datetime.now()
@@ -437,6 +451,7 @@ class UndeleteViewTests(ViewBaseTestCase):
 
     def test_submit_redirect_next(self):
         """Checks that user is redirected after submition to next query string parameter"""
+
         self.client.login(username='user1', password='user1')
         ids = [self.message.pk]
         next = reverse('messages_outbox')
