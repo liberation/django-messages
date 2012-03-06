@@ -18,7 +18,7 @@ class Command(BaseCommand):
             action='store_true',
             dest='dryrun',
             default=False,
-            help='Report what will be deleted without actually doing it'),
+            help='Count the number of messages that would be deleted without actually doing it'),
         )
 
     def handle(self, *args, **options):
@@ -31,11 +31,7 @@ class Command(BaseCommand):
             recipient_deleted_at__lte=limit
         )
         if dryrun:
-            output = ''
-            for message in query:
-                output += '%s pk=%s\n' % (message.subject, message.pk)
             count = query.count()
-            output += 'Total count of item to be deleted %s' % count
-            print output
+            print 'Total count of messages to be deleted: %d' % count
         else:
             query.delete()
