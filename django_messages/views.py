@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response, get_object_or_404, get_list_or_
 from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 from django.core.urlresolvers import reverse
@@ -73,8 +74,7 @@ def compose(request, recipient=None, form_class=ComposeForm,
         form = form_class(request.POST, recipient_filter=recipient_filter, sender=request.user)
         if form.is_valid():
             msg = form.save()
-            request.user.message_set.create(
-                message=_(u"Message successfully sent."))
+            messages.add_message(request, messages.INFO, _(u"Message successfully sent."))
             if success_url is None:
                 success_url = reverse('messages_detail', kwargs={'conversation_id' : msg.conversation_id})
             if request.GET.has_key('next'):
@@ -85,7 +85,7 @@ def compose(request, recipient=None, form_class=ComposeForm,
         if recipient is not None:
             try:
                 form.fields['recipient'].initial = User.objects.get(username=recipient)
-            except:
+            except User.DoesNotExist:
                 return HttpResponseRedirect(reverse('messages_compose'))
     return render_to_response(template_name, {
         'form': form,
@@ -114,8 +114,7 @@ def reply(request, message_id, form_class=ComposeForm,
         form = form_class(postdata, recipient_filter=recipient_filter, sender=request.user)
         if form.is_valid():
             msg = form.save(parent_msg=parent)
-            request.user.message_set.create(
-                message=_(u"Message successfully sent."))
+            messages.add_message(request, messages.INFO, _(u"Message successfully sent."))
             if success_url is None:
                 success_url = reverse('messages_detail', kwargs={'conversation_id' : msg.conversation_id})
             return HttpResponseRedirect(success_url)
@@ -156,7 +155,7 @@ def delete(request, success_url=None, *args, **kwargs):
         if result1 or result2:
             deleted = True    
         if deleted:
-            user.message_set.create(message=_(u"Conversation successfully deleted."))
+            messages.add_message(request, messages.INFO, _(u"Conversation successfully deleted."))
             return HttpResponseRedirect(success_url)
     raise Http404
 delete = login_required(delete)
@@ -184,7 +183,7 @@ def undelete(request, success_url=None, **kwargs):
            undeleted = True    
             
         if undeleted:
-            user.message_set.create(message=_(u"Conversation successfully recovered."))
+            messages.add_message(request, messages.INFO, _(u"Conversation successfully recovered."))
             return HttpResponseRedirect(success_url)
     raise Http404
 undelete = login_required(undelete)
