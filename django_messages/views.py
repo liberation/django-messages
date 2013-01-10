@@ -84,7 +84,7 @@ def compose(request, recipient=None, form_class=ComposeForm,
         form = form_class(sender=request.user)
         if recipient is not None:
             try:
-                form.fields['recipient'].initial = User.objects.get(username=recipient)
+                form.fields['recipient'].initial = unicode(User.objects.get(username=recipient))
             except User.DoesNotExist:
                 return HttpResponseRedirect(reverse('messages_compose'))
     return render_to_response(template_name, {
