@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='django-messages',
-    version=__import__('django_messages').__version__,
+    version='0.5.0.pre',
     description='User-to-user messaging system for Django',
     author='Arne Brodowski',
     author_email='mail@arnebrodowski.de',
